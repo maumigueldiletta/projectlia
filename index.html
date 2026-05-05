@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankApp - Seu Banco Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-height: 100vh;
+        }
+
+        .app-header {
+            background: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .header-greeting {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .greeting-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .greeting-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .icon-button:hover {
+            background: #e8e8e8;
+        }
+
+        .lia-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
+        }
+
+        .lia-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(139, 0, 0, 0.4);
+        }
+
+        .lia-button:active {
+            transform: scale(0.95);
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tela de Saldo */
+        .balance-card {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(139, 0, 0, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .balance-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .balance-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .balance-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            opacity: 0.85;
+        }
+
+        .balance-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .balance-action-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .balance-action-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-link {
+            font-size: 12px;
+            color: #DC143C;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .service-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
+        }
+
+        .service-item:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .service-icon {
+            font-size: 28px;
+        }
+
+        .service-name {
+            font-size: 11px;
+            color: #333;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .transactions-section {
+            margin-top: 24px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-info {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .transaction-details h4 {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 3px;
+            font-weight: 600;
+        }
+
+        .transaction-details p {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .transaction-amount.out {
+            color: #DC143C;
+        }
+
+        /* Tela de Transferências */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #DC143C;
+            box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 0, 0, 0.3);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        /* Tela de Cartões */
+        .card-item {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 6px 16px rgba(139, 0, 0, 0.2);
+        }
+
+        .card-number {
+            font-size: 16px;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+        }
+
+        .card-holder {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-holder-label {
+            opacity: 0.8;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .card-expiry {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-expiry-label {
+            opacity: 0.8;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            font-size: 11px;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .nav-item:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-item.active {
+            color: white;
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+        }
+
+        /* Modal para LIA */
+        .lia-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .lia-modal.active {
+            display: flex;
+        }
+
+        .lia-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            max-height: 100vh;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .lia-header {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .lia-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-lia {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-lia:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lia-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .lia-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(220, 20, 60, 0.1);
+            border-top-color: #DC143C;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .pix-code {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .pix-code-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .pix-code-value {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #333;
+            word-break: break-all;
+            margin-bottom: 8px;
+        }
+
+        .copy-button {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 0, 0, 0.2);
+        }
+
+        .copy-button:active {
+            transform: translateY(0);
+        }
+
+        /* Scrollbar customizado */
+        .content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 3px;
+        }
+
+        .content::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+            border: 1px solid #c3e6cb;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .screen-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="app-header">
+            <div class="header-left">
+                <div class="user-avatar">J</div>
+                <div class="header-greeting">
+                    <span class="greeting-text">Olá,</span>
+                    <span class="greeting-name">João Silva!</span>
+                </div>
+            </div>
+            <div class="header-icons">
+                <button class="icon-button" title="Notificações">🔔</button>
+                <button class="lia-button" id="liaBtn" title="Fale com LIA">LIA</button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Tela de Saldo -->
+            <div class="screen active" id="balanceScreen">
+                <div class="balance-card">
+                    <div class="balance-content">
+                        <div class="balance-label">Saldo Disponível</div>
+                        <div class="balance-amount">R$ 12.450,50</div>
+                        <div class="balance-info">
+                            <span>Limite: R$ 5.000,00</span>
+                            <span>Total: R$ 17.450,50</span>
+                        </div>
+                        <div class="balance-actions">
+                            <button class="balance-action-btn" onclick="goToScreen('transferScreen')">
+                                <span>↗</span> Enviar
+                            </button>
+                            <button class="balance-action-btn" onclick="goToScreen('pixScreen')">
+                                <span>↙</span> Receber
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <span>Serviços</span>
+                    <span class="section-link" onclick="alert('Ver todos os serviços')">Ver todos</span>
+                </div>
+
+                <div class="services-grid">
+                    <div class="service-item" onclick="goToScreen('transferScreen')">
+                        <span class="service-icon">💸</span>
+                        <span class="service-name">Transferir</span>
+                    </div>
+                    <div class="service-item" onclick="goToScreen('pixScreen')">
+                        <span class="service-icon">📱</span>
+                        <span class="service-name">PIX</span>
+                    </div>
+                    <div class="service-item" onclick="goToScreen('cardsScreen')">
+                        <span class="service-icon">💳</span>
+                        <span class="service-name">Cartões</span>
+                    </div>
+                    <div class="service-item" onclick="alert('Funcionalidade em desenvolvimento')">
+                        <span class="service-icon">📊</span>
+                        <span class="service-name">Investir</span>
+                    </div>
+                </div>
+
+                <div class="transactions-section">
+                    <div class="section-title">
+                        <span>Lançamentos recentes</span>
+                        <span class="section-link">⋮</span>
+                    </div>
+                    
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">🛒</div>
+                            <div class="transaction-details">
+                                <h4>Compra no Mercado</h4>
+                                <p>Hoje às 14:30</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount out">-R$ 156,80</div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">💼</div>
+                            <div class="transaction-details">
+                                <h4>Salário Recebido</h4>
+                                <p>Ontem às 09:00</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">+R$ 3.500,00</div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">🏠</div>
+                            <div class="transaction-details">
+                                <h4>Aluguel Pago</h4>
+                                <p>2 dias atrás</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount out">-R$ 1.200,00</div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">🍕</div>
+                            <div class="transaction-details">
+                                <h4>Restaurante</h4>
+                                <p>3 dias atrás</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount out">-R$ 89,50</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tela de Transferências -->
+            <div class="screen" id="transferScreen">
+                <h2 class="screen-title">Transferência Bancária</h2>
+                
+                <div class="success-message" id="transferSuccess">
+                    ✓ Transferência realizada com sucesso!
+                </div>
+
+                <div class="form-group">
+                    <label>Banco do Destinatário</label>
+                    <select>
+                        <option>Selecione um banco</option>
+                        <option>Banco do Brasil</option>
+                        <option>Caixa Econômica</option>
+                        <option>Bradesco</option>
+                        <option>Itaú</option>
+                        <option>Santander</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Agência</label>
+                    <input type="text" placeholder="0000" maxlength="5">
+                </div>
+
+                <div class="form-group">
+                    <label>Conta</label>
+                    <input type="text" placeholder="000000-0" maxlength="10">
+                </div>
+
+                <div class="form-group">
+                    <label>Nome do Destinatário</label>
+                    <input type="text" placeholder="Digite o nome completo">
+                </div>
+
+                <div class="form-group">
+                    <label>Valor</label>
+                    <input type="number" placeholder="0,00" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição (opcional)</label>
+                    <input type="text" placeholder="Digite uma descrição">
+                </div>
+
+                <button class="submit-button" onclick="submitTransfer()">Confirmar Transferência</button>
+            </div>
+
+            <!-- Tela de PIX -->
+            <div class="screen" id="pixScreen">
+                <h2 class="screen-title">PIX</h2>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                    <button class="service-item" onclick="showPixReceive()" style="grid-column: 1 / -1; padding: 16px; border: none; background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%); color: white;">
+                        <span class="service-icon">📥</span>
+                        <span class="service-name" style="color: white;">Receber PIX</span>
+                    </button>
+                    <button class="service-item" onclick="showPixSend()" style="border: 1px solid #DC143C; background: white;">
+                        <span class="service-icon">📤</span>
+                        <span class="service-name">Enviar PIX</span>
+                    </button>
+                    <button class="service-item" onclick="showPixCopy()" style="border: 1px solid #DC143C; background: white;">
+                        <span class="service-icon">📋</span>
+                        <span class="service-name">Cópia e Cola</span>
+                    </button>
+                </div>
+
+                <div id="pixContent"></div>
+            </div>
+
+            <!-- Tela de Cartões -->
+            <div class="screen" id="cardsScreen">
+                <h2 class="screen-title">Meus Cartões</h2>
+
+                <div class="card-item">
+                    <div class="card-number">•••• •••• •••• 4521</div>
+                    <div class="card-details">
+                        <div class="card-holder">
+                            <span class="card-holder-label">TITULAR</span>
+                            <span>João Silva</span>
+                        </div>
+                        <div class="card-expiry">
+                            <span class="card-expiry-label">VALIDADE</span>
+                            <span>12/26</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-item" style="background: linear-gradient(135deg, #333 0%, #555 100%);">
+                    <div class="card-number">•••• •••• •••• 8765</div>
+                    <div class="card-details">
+                        <div class="card-holder">
+                            <span class="card-holder-label">TITULAR</span>
+                            <span>João Silva</span>
+                        </div>
+                        <div class="card-expiry">
+                            <span class="card-expiry-label">VALIDADE</span>
+                            <span>08/27</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="submit-button" style="margin-top: 20px;" onclick="alert('Funcionalidade em desenvolvimento')">Solicitar Novo Cartão</button>
+            </div>
+        </div>
+
+        <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <button class="nav-item active" onclick="goToScreen('balanceScreen')">
+                <span class="nav-icon">🏠</span>
+                <span>Início</span>
+            </button>
+            <button class="nav-item" onclick="goToScreen('transferScreen')">
+                <span class="nav-icon">💸</span>
+                <span>Transferir</span>
+            </button>
+            <button class="nav-item" onclick="goToScreen('pixScreen')">
+                <span class="nav-icon">📱</span>
+                <span>PIX</span>
+            </button>
+            <button class="nav-item" onclick="goToScreen('cardsScreen')">
+                <span class="nav-icon">💳</span>
+                <span>Cartões</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal LIA -->
+    <div class="lia-modal" id="liaModal">
+        <div class="lia-container">
+            <div class="lia-header">
+                <h2>LIA - Seu Assistente</h2>
+                <button class="close-lia" onclick="closeLIA()">✕</button>
+            </div>
+            <div class="lia-content">
+                <div class="loading-spinner"></div>
+                <iframe class="lia-iframe" id="liaIframe"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para navegar entre telas
+        function goToScreen(screenId) {
+            // Ocultar todas as telas
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            // Mostrar a tela selecionada
+            document.getElementById(screenId).classList.add('active');
+
+            // Atualizar navegação
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Adicionar classe active ao item correto
+            if (screenId === 'transferScreen') {
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+            } else if (screenId === 'pixScreen') {
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+            } else if (screenId === 'cardsScreen') {
+                document.querySelectorAll('.nav-item')[3].classList.add('active');
+            } else if (screenId === 'balanceScreen') {
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            }
+        }
+
+        // Função para abrir LIA
+        function openLIA() {
+            const liaModal = document.getElementById('liaModal');
+            liaModal.classList.add('active');
+
+            // Usar o código de embed gerado diretamente
+            const liaContent = document.querySelector('.lia-content');
+            liaContent.innerHTML = '<iframe src="https://embed.liveavatar.com/v1/c8220bef-c8e7-4305-b984-92f06a089348?orientation=horizontal" allow="microphone" title="LiveAvatar Embed" style="width: 100%; height: 100%; border: none;"></iframe>';
+            
+            // Remover spinner
+            const spinner = document.querySelector('.loading-spinner');
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+        }
+
+        // Função para fechar LIA
+        function closeLIA() {
+            const liaModal = document.getElementById('liaModal');
+            liaModal.classList.remove('active');
+            
+            // Limpar iframe
+            const liaContent = document.querySelector('.lia-content');
+            liaContent.innerHTML = '<div class="loading-spinner"></div><iframe class="lia-iframe" id="liaIframe"></iframe>';
+        }
+
+        // Função para enviar transferência
+        function submitTransfer() {
+            const inputs = document.querySelectorAll('#transferScreen input, #transferScreen select');
+            let allFilled = true;
+
+            inputs.forEach(input => {
+                if (input.value.trim() === '' && input.placeholder !== 'Digite uma descrição') {
+                    allFilled = false;
+                }
+            });
+
+            if (allFilled) {
+                document.getElementById('transferSuccess').classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('transferSuccess').classList.remove('show');
+                    // Limpar formulário
+                    inputs.forEach(input => input.value = '');
+                }, 3000);
+            } else {
+                alert('Por favor, preencha todos os campos obrigatórios');
+            }
+        }
+
+        // Funções PIX
+        function showPixReceive() {
+            document.getElementById('pixContent').innerHTML = `
+                <h3>Suas Chaves PIX</h3>
+                <div class="pix-code">
+                    <div class="pix-code-label">CPF</div>
+                    <div class="pix-code-value">123.456.789-00</div>
+                    <button class="copy-button" onclick="copyToClipboard('123.456.789-00')">Copiar</button>
+                </div>
+                <div class="pix-code">
+                    <div class="pix-code-label">Email</div>
+                    <div class="pix-code-value">joao.silva@email.com</div>
+                    <button class="copy-button" onclick="copyToClipboard('joao.silva@email.com')">Copiar</button>
+                </div>
+                <div class="pix-code">
+                    <div class="pix-code-label">Telefone</div>
+                    <div class="pix-code-value">+55 11 98765-4321</div>
+                    <button class="copy-button" onclick="copyToClipboard('+55 11 98765-4321')">Copiar</button>
+                </div>
+            `;
+        }
+
+        function showPixSend() {
+            document.getElementById('pixContent').innerHTML = `
+                <h3>Enviar PIX</h3>
+                <div class="form-group">
+                    <label>Chave PIX do Destinatário</label>
+                    <input type="text" placeholder="CPF, Email, Telefone ou Chave Aleatória">
+                </div>
+                <div class="form-group">
+                    <label>Valor</label>
+                    <input type="number" placeholder="0,00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Descrição (opcional)</label>
+                    <input type="text" placeholder="Digite uma descrição">
+                </div>
+                <button class="submit-button" onclick="submitPix()">Enviar PIX</button>
+            `;
+        }
+
+        function showPixCopy() {
+            document.getElementById('pixContent').innerHTML = `
+                <h3>PIX Cópia e Cola</h3>
+                <p>Cole o código PIX abaixo para realizar a transferência:</p>
+                <div class="pix-code">
+                    <div class="pix-code-label">Código PIX</div>
+                    <div class="pix-code-value">00020126580014br.gov.bcb.pix0136xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx520400005303986540510.005802BR5913JOAO SILVA6009SAO PAULO62410503***63041D3D</div>
+                    <button class="copy-button" onclick="copyToClipboard('00020126580014br.gov.bcb.pix0136xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx520400005303986540510.005802BR5913JOAO SILVA6009SAO PAULO62410503***63041D3D')">Copiar Código</button>
+                </div>
+            `;
+        }
+
+        function submitPix() {
+            alert('PIX enviado com sucesso!');
+            showPixReceive();
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copiado para a área de transferência!');
+            });
+        }
+
+        // Event listeners
+        document.getElementById('liaBtn').addEventListener('click', openLIA);
+
+        // Fechar modal ao clicar fora
+        document.getElementById('liaModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLIA();
+            }
+        });
+
+        // Inicializar com tela de saldo
+        goToScreen('balanceScreen');
+    </script>
+</body>
+</html>
